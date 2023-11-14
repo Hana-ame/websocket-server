@@ -16,7 +16,7 @@ var upgrader = websocket.Upgrader{
 
 func main() {
 	router := gin.Default()
-	router.GET("/ws", func(c *gin.Context) {
+	router.GET("/ws/", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -24,13 +24,17 @@ func main() {
 		}
 		defer conn.Close()
 		for {
-			typ, data, err := conn.ReadMessage()
-			if err != nil {
-				fmt.Println(err.Error())
-				conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			typ, data, e := conn.ReadMessage()
+			if e != nil {
+				err = e
+				break
 			}
 			conn.WriteMessage(typ, data)
 		}
+		if err != nil {
+			fmt.Println(err.Error())
+			conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+		}
 	})
-	router.Run(":14514")
+	router.Run("127.114.5.14:8080")
 }
