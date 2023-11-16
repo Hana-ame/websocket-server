@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -38,12 +39,6 @@ func handler(c *websocket.Conn) error {
 	syncMap.Store(op, c)
 	defer syncMap.Delete(op)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		wg.Done()
-	}()
-
 	for {
 		if typ, data, err := c.ReadMessage(); err != nil {
 			c.WriteMessage(websocket.CloseMessage, []byte(err.Error()))
@@ -56,5 +51,24 @@ func handler(c *websocket.Conn) error {
 
 func handleMessage(c *websocket.Conn, typ int, data []byte) {
 	// echo
-	c.WriteMessage(typ, data)
+	// c.WriteMessage(typ, data)
+	// netwrokMsg
+	c2s := &C2S_Message{}
+	s2c := &S2C_Message{NetworkMessageID: SMsgID(c2s.NetworkMessageID)}
+	if err := json.Unmarshal(data, c2s); err != nil {
+		// error
+		s2c.Load(Unknown, err.Error())
+		SendMsg(c, typ, s2c)
+		return
+	}
+	switch c2s.NetworkMessageID {
+	case C2S_Login:
+		// receive
+		s2c := Login(c2s.Payload)
+		SendMsg(c, typ, s2c)
+		return
+	default:
+		s2c.Load(Unknown, "NetworkMessageID not supported")
+	}
+
 }

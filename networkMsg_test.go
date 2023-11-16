@@ -22,14 +22,14 @@ func TestMessageID(t *testing.T) {
 
 // marshal, pass
 func TestMarshal(t *testing.T) {
-	o := &Message{S2C_Regist, (`123\\<><><>>{"123":1231232}`)}
+	o := &C2S_Message{S2C_Regist, (`123\\<><><>>{"123":1231232}`)}
 	fmt.Println(o)
 	b, e := json.Marshal(&o)
 	fmt.Printf("%s\n", b)
 	if e != nil {
 		t.Error(e)
 	}
-	o2 := &Message{}
+	o2 := &C2S_Message{}
 	fmt.Println(o2)
 	json.Unmarshal(b, o2)
 	fmt.Println(o2)
@@ -40,13 +40,13 @@ func TestMarshalNoEscapeHTML(t *testing.T) {
 	// encoder := json.NewEncoder(os.Stdout)
 	// encoder.SetEscapeHTML(false)
 
-	o := &Message{S2C_Regist, (`123\\<><><>>{"123":1231232}`)}
-	b, e := o.JSON()
+	o := &C2S_Message{S2C_Regist, (`123\\<><><>>{"123":1231232}`)}
+	b, e := json.Marshal(o)
 	fmt.Printf("%s\n", b)
 	if e != nil {
 		t.Error(e)
 	}
-	o2 := &Message{}
+	o2 := &C2S_Message{}
 	fmt.Println(o2)
 	json.Unmarshal(b, o2)
 	fmt.Println(o2)
