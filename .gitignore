@@ -3,6 +3,7 @@
 *.rar
 *.exe
 *.bin
+*.db
 
 misc/ThisGame
 misc

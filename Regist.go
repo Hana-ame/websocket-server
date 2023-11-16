@@ -33,7 +33,7 @@ func Regist(payload string) (s2c *S2C_Message) {
 	// return
 	r := &msg.S2C_Regist{}
 	// public code
-	b, err := json.Marshal(r)
+	b, err := r.JSON()
 	if err != nil {
 		// error
 		s2c.Load(Unknown, err.Error())

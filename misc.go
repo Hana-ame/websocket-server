@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/sha256"
-	"encoding/json"
 	"fmt"
 
 	"github.com/gorilla/websocket"
@@ -27,7 +26,7 @@ func SMsgID(id NetworkMessageID) NetworkMessageID {
 }
 
 func SendMsg(c *websocket.Conn, typ int, s2c any) {
-	b, err := json.Marshal(s2c)
+	b, err := s2c.(*S2C_Message).JSON()
 	if err != nil {
 		c.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 	}

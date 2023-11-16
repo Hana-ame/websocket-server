@@ -7,4 +7,4 @@ export CGO_ENABLED=0
 # export CC="x86_64-linux-musl-gcc"
 export CGO_ENABLED=1
 
-go build -o wss.bin
+# go build -o wss.bin

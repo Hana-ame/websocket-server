@@ -34,6 +34,15 @@ type C2S_Message struct {
 	Payload string `json:"content"`
 }
 
+// 返回 non-html escaped JSON
+func (t *C2S_Message) JSON() ([]byte, error) {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(t)
+	return buffer.Bytes(), err
+}
+
 type S2C_Message struct {
 
 	// 在 websocket 中传送的包的类型标志。
@@ -47,7 +56,7 @@ type S2C_Message struct {
 }
 
 // 返回 non-html escaped JSON
-func (t *S2C_Message) MarshalJSON() ([]byte, error) {
+func (t *S2C_Message) JSON() ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)

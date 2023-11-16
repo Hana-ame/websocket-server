@@ -62,6 +62,11 @@ func handleMessage(c *websocket.Conn, typ int, data []byte) {
 		return
 	}
 	switch c2s.NetworkMessageID {
+	case C2S_Regist:
+		// receive
+		s2c := Regist(c2s.Payload)
+		SendMsg(c, typ, s2c)
+		return
 	case C2S_Login:
 		// receive
 		s2c := Login(c2s.Payload)
@@ -69,6 +74,7 @@ func handleMessage(c *websocket.Conn, typ int, data []byte) {
 		return
 	default:
 		s2c.Load(Unknown, "NetworkMessageID not supported")
+		SendMsg(c, typ, s2c)
 	}
 
 }

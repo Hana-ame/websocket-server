@@ -34,7 +34,7 @@ func Login(payload string) (s2c *S2C_Message) {
 	r := &msg.S2C_Login{
 		Name: user.Name,
 	}
-	b, err := json.Marshal(r)
+	b, err := r.JSON()
 	if err != nil {
 		s2c.Load(Unknown, err.Error())
 		return
