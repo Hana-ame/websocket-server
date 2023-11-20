@@ -7,15 +7,15 @@ import (
 	"github.com/Hana-ame/websocket-server/msg"
 )
 
-func Regist(payload string) (s2c *S2C_Message) {
-	s2c = &S2C_Message{NetworkMessageID: S2C_Regist}
+func Regist(payload string) (NetworkMessageResult, string) {
+	// s2c = &S2C_Message{NetworkMessageID: S2C_Regist}
 
 	// receive
 	o := &msg.C2S_Regist{}
 	if err := json.Unmarshal([]byte(payload), o); err != nil {
 		// error
-		s2c.Load(Unknown, err.Error())
-		return
+		// s2c.Load(Unknown, err.Error())
+		return Unknown, err.Error()
 	}
 
 	// db
@@ -26,20 +26,20 @@ func Regist(payload string) (s2c *S2C_Message) {
 	}
 	if err := db.CreateUser(user); err != nil {
 		// error
-		s2c.Load(Unknown, err.Error())
-		return
+		// s2c.Load(Unknown, err.Error())
+		return Unknown, err.Error()
 	}
 
 	// return
 	r := &msg.S2C_Regist{}
 	// public code
-	b, err := r.JSON()
+	b, err := JSON(r)
 	if err != nil {
 		// error
-		s2c.Load(Unknown, err.Error())
-		return
+		// s2c.Load(Unknown, err.Error())
+		return Unknown, err.Error()
 	}
 
-	s2c.Load(OK, string(b))
-	return
+	// s2c.Load(OK, string(b))
+	return OK, string(b)
 }

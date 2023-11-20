@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 
 	"github.com/gorilla/websocket"
@@ -14,6 +16,7 @@ func Sha256(s string) string {
 	return fmt.Sprintf("%x", bs)
 }
 
+// the server messageID from client messageID
 func SMsgID(id NetworkMessageID) NetworkMessageID {
 	switch id {
 	case C2S_Login:
@@ -25,10 +28,26 @@ func SMsgID(id NetworkMessageID) NetworkMessageID {
 	}
 }
 
+// send json object to websocket conn
 func SendMsg(c *websocket.Conn, typ int, s2c any) {
 	b, err := s2c.(*S2C_Message).JSON()
 	if err != nil {
-		c.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+		msg := &S2C_Message{
+			NetworkMessageID:     -1,
+			NetworkMessageResult: 0,
+			Payload:              err.Error(),
+		}
+		b, _ := msg.JSON()
+		c.WriteMessage(websocket.TextMessage, b)
 	}
 	c.WriteMessage(typ, b)
+}
+
+// marshal json wich no html escape
+func JSON(o any) ([]byte, error) {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(o)
+	return buffer.Bytes(), err
 }

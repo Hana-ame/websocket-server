@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -52,29 +53,44 @@ func handler(c *websocket.Conn) error {
 func handleMessage(c *websocket.Conn, typ int, data []byte) {
 	// echo
 	// c.WriteMessage(typ, data)
+	// recv
+	log.Printf("received: %s", data)
 	// netwrokMsg
 	c2s := &C2S_Message{}
-	s2c := &S2C_Message{NetworkMessageID: SMsgID(c2s.NetworkMessageID)}
+	s2c := &S2C_Message{NetworkMessageID: c2s.NetworkMessageID}
 	if err := json.Unmarshal(data, c2s); err != nil {
 		// error
-		s2c.Load(Unknown, err.Error())
-		SendMsg(c, typ, s2c)
+		s2c.
+			Load(Unknown, string(data)).
+			SendToConnWithType(c, typ)
+		// SendMsg(c, typ, s2c)
 		return
 	}
 	switch c2s.NetworkMessageID {
 	case C2S_Regist:
 		// receive
-		s2c := Regist(c2s.Payload)
-		SendMsg(c, typ, s2c)
+		// s2c := Regist(c2s.Payload)
+		// SendMsg(c, typ, s2c)
+		s2c.
+			SetMessageID(SMsgID(c2s.NetworkMessageID)).
+			Load(Regist(c2s.Payload)).
+			SendToConnWithType(c, typ)
 		return
 	case C2S_Login:
 		// receive
-		s2c := Login(c2s.Payload)
-		SendMsg(c, typ, s2c)
+		// s2c := Login(c2s.Payload)
+		// SendMsg(c, typ, s2c)
+		s2c.
+			SetMessageID(SMsgID(c2s.NetworkMessageID)).
+			Load(Login(c2s.Payload)).
+			SendToConnWithType(c, typ)
 		return
 	default:
-		s2c.Load(Unknown, "NetworkMessageID not supported")
-		SendMsg(c, typ, s2c)
+		s2c.
+			SetMessageID(SMsgID(c2s.NetworkMessageID)).
+			Load(Unknown, "NetworkMessageID not supported").
+			SendToConnWithType(c, typ)
+		// SendMsg(c, typ, s2c)
 	}
 
 }
