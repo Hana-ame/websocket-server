@@ -31,6 +31,23 @@ func main() {
 		defer conn.Close()
 		handler(conn)
 	})
+	router.GET("/ws/echo/", func(c *gin.Context) {
+		// echo
+		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+		if err != nil {
+			c.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+		defer conn.Close()
+		for {
+			if typ, data, err := conn.ReadMessage(); err != nil {
+				conn.WriteMessage(websocket.CloseMessage, []byte(err.Error()))
+				return
+			} else {
+				conn.WriteMessage(typ, data)
+			}
+		}
+	})
 	router.POST("/upload", upload)
 	router.Run("127.114.5.14:8080")
 }
@@ -51,8 +68,6 @@ func handler(c *websocket.Conn) error {
 }
 
 func handleMessage(c *websocket.Conn, typ int, data []byte) {
-	// echo
-	// c.WriteMessage(typ, data)
 	// recv
 	log.Printf("received: %s", data)
 	// netwrokMsg

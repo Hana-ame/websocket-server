@@ -27,7 +27,7 @@ const (
 	LoginWrongPassword                      //密码错误
 )
 
-// 在 websocket 中传送的包。
+// 在 websocket 中传送的包。作为接收。
 type C2S_Message struct {
 
 	// 在 websocket 中传送的包的类型标志。
@@ -46,6 +46,7 @@ func (t *C2S_Message) JSON() ([]byte, error) {
 	return buffer.Bytes(), err
 }
 
+// 在 websocket 中传送的包。作为返回。
 type S2C_Message struct {
 
 	// 在 websocket 中传送的包的类型标志。
