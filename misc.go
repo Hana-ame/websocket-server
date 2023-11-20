@@ -49,5 +49,12 @@ func JSON(o any) ([]byte, error) {
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)
 	err := encoder.Encode(o)
-	return buffer.Bytes(), err
+	return trim(buffer.Bytes()), err
+}
+
+func trim(b []byte) []byte {
+	if b[len(b)-1] == '\n' {
+		return b[:len(b)-1]
+	}
+	return b
 }
